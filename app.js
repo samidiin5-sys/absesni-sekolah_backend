@@ -19,10 +19,23 @@ const upload = multer();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Setup Middlewares
+// Setup CORS — izinkan origin dari env var, atau semua origin jika tidak diset
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : ['http://localhost:3000'];
+
 app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
+  origin: function (origin, callback) {
+    // Izinkan request tanpa origin (Postman, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS: Origin ${origin} tidak diizinkan`), false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(express.json());
@@ -54,15 +67,21 @@ app.use((err, req, res, next) => {
   return res.status(500).json(response(500, 'Terjadi kesalahan internal pada server'));
 });
 
-// Test DB Connection and Start Server
-db.sequelize.authenticate()
-  .then(() => {
-    console.log('Database berhasil tersambung');
-    app.listen(PORT, () => {
-      console.log(`Server running at http://localhost:${PORT}`);
+// Jika bukan di Vercel (serverless), jalankan server biasa
+if (process.env.VERCEL !== '1') {
+  db.sequelize.authenticate()
+    .then(() => {
+      console.log('Database berhasil tersambung');
+      app.listen(PORT, () => {
+        console.log(`Server running at http://localhost:${PORT}`);
+      });
+    })
+    .catch(error => {
+      console.error('Database gagal tersambung:', error.message);
+      process.exit(1);
     });
-  })
-  .catch(error => {
-    console.error('Database gagal tersambung:', error.message);
-    process.exit(1);
-  });
+}
+
+// Export untuk Vercel serverless
+module.exports = app;
+
