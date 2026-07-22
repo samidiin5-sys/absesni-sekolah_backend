@@ -7,13 +7,17 @@ const config = require(__dirname + '/../config/config.js')[env];
 const db = {};
 
 let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
-} else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+try {
+  if (config.use_env_variable) {
+    sequelize = new Sequelize(process.env[config.use_env_variable], config);
+  } else {
+    sequelize = new Sequelize(config.database, config.username, config.password, config);
+  }
+} catch (err) {
+  console.error("Failed to initialize Sequelize:", err);
 }
 
-// Explicitly require models instead of fs.readdirSync (for Vercel serverless compatibility)
+// Explicitly require models for Vercel serverless compatibility
 const User = require('./user')(sequelize, Sequelize.DataTypes);
 const Class = require('./class')(sequelize, Sequelize.DataTypes);
 const Student = require('./student')(sequelize, Sequelize.DataTypes);
