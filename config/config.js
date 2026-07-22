@@ -5,9 +5,12 @@ const RAILWAY_DB = {
   password: process.env.DB_PASSWORD || 'vDgXilOnfJIwqCxfRKFMCYnxQmTvYCSK',
   database: process.env.DB_NAME || 'railway',
   host: process.env.DB_HOST || 'sakura.proxy.rlwy.net',
-  port: process.env.DB_PORT || 36506,
+  port: parseInt(process.env.DB_PORT || '36506', 10),
   dialect: 'mysql',
-  logging: false
+  logging: false,
+  dialectOptions: {
+    connectTimeout: 60000
+  }
 };
 
 module.exports = {
