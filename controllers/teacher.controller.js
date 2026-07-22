@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const Validator = require('fastest-validator');
 const { User } = require('../models');
 const { response } = require('../helpers/response.formatter');
