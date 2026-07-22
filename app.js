@@ -19,20 +19,9 @@ const upload = multer();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Setup CORS — izinkan origin dari env var, atau semua origin jika tidak diset
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
-  : ['http://localhost:3000'];
-
+// Setup CORS — default allow all origins unless explicitly configured
 app.use(cors({
-  origin: function (origin, callback) {
-    // Izinkan request tanpa origin (Postman, curl, server-to-server)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error(`CORS: Origin ${origin} tidak diizinkan`), false);
-  },
+  origin: '*',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
