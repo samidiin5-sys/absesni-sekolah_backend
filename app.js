@@ -66,21 +66,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Jika bukan di Vercel (serverless), jalankan server biasa
-if (process.env.VERCEL !== '1') {
-  db.sequelize.authenticate()
-    .then(() => {
-      console.log('Database berhasil tersambung');
-      app.listen(PORT, () => {
-        console.log(`Server running at http://localhost:${PORT}`);
-      });
-    })
-    .catch(error => {
-      console.error('Database gagal tersambung:', error.message);
-      process.exit(1);
-    });
-}
-
 // Export untuk Vercel serverless
 module.exports = app;
+
 
