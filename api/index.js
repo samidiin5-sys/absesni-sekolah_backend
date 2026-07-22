@@ -1,3 +1,3 @@
-const app = require('../app');
-
-module.exports = app;
+module.exports = (req, res) => {
+  res.status(200).send("HELLO VERCEL SERVERLESS 2");
+};
