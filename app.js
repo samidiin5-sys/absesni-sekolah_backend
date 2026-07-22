@@ -29,7 +29,12 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(upload.none());
+app.use((req, res, next) => {
+  if (req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
+    return upload.none()(req, res, next);
+  }
+  next();
+});
 
 // Initial endpoint
 app.get('/', (req, res) => {
