@@ -57,8 +57,13 @@ app.use((req, res) => {
 
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', err.message);
-  return res.status(500).json(response(500, 'Terjadi kesalahan internal pada server'));
+  console.error('Unhandled Error:', err);
+  return res.status(500).json({
+    status: 500,
+    message: err.message || 'Terjadi kesalahan internal pada server',
+    error: err.toString(),
+    stack: err.stack
+  });
 });
 
 // Jika bukan di Vercel (serverless), jalankan server biasa
